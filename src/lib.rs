@@ -14,6 +14,8 @@ const RAW_SCRIPT: &str = include_str!("../script.sh");
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
 
+    let data_dir = xdg::BaseDirectories::with_prefix("nts")?.get_data_home();
+
     rouille::start_server(
         format!("0.0.0.0:{}", settings.port),
         move |request| match request.url().as_str() {
@@ -40,7 +42,14 @@ pub fn run() -> Result<(), Error> {
                     .map_err(Error::BodyRead)
                     .unwrap();
 
-                println!("{}", note);
+                let file_name = data_dir
+                    .join(jiff::Timestamp::now().as_millisecond().to_string())
+                    .with_extension("txt");
+
+                std::fs::create_dir_all(&file_name.parent().unwrap()).unwrap();
+                std::fs::write(file_name, note)
+                    .map_err(Error::WriteNote)
+                    .unwrap();
 
                 Response::text("ok")
             }

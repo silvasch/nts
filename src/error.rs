@@ -2,6 +2,8 @@
 pub enum Error {
     #[error("failed to read the body of the request: {0}")]
     BodyRead(std::io::Error),
+    #[error("failed to write a note: {0}")]
+    WriteNote(std::io::Error),
 
     #[error("config error: {0}")]
     Settings(#[from] config::ConfigError),
