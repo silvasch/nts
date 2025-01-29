@@ -9,7 +9,7 @@ mod settings;
 use rouille::Response;
 use settings::Settings;
 
-const RAW_SCRIPT: &str = include_str!("../script.sh");
+const RAW_SCRIPT: &str = include_str!("../scripts/write.sh");
 
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
@@ -53,7 +53,7 @@ pub fn run() -> Result<(), Error> {
 
                 Response::text("ok")
             }
-            "/script" => {
+            "/write" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
                         .with_status_code(405);
