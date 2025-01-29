@@ -4,4 +4,7 @@ HOST={{HOST}}
 
 read -p "> " NOTE < /dev/tty
 
-curl -X POST -d $NOTE $HOST/new
+read -s -p "password: " PASSWORD < /dev/tty
+PASSWORD=$(echo $PASSWORD | base64)
+
+curl -X POST -d $NOTE -H "Authorization: Basic $PASSWORD" $HOST/new

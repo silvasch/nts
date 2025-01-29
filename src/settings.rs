@@ -5,6 +5,8 @@ pub struct Settings {
     pub port: u16,
 
     pub external_url: String,
+
+    pub password: String,
 }
 
 impl Settings {
@@ -19,10 +21,12 @@ impl Settings {
 
         let port = settings.get_int("port").unwrap_or(8080);
         let external_url = settings.get_string("external_url")?;
+        let password = settings.get_string("password")?;
 
         Ok(Self {
             port: port as u16,
             external_url,
+            password,
         })
     }
 }

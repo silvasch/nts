@@ -1,3 +1,5 @@
+use base64::prelude::*;
+
 mod error;
 use std::io::Read;
 
@@ -19,6 +21,15 @@ pub fn run() -> Result<(), Error> {
                 if request.method() != "POST" {
                     return Response::text("this route only allows POST requests.")
                         .with_status_code(405);
+                }
+
+                let authorization = request.header("Authorization").unwrap();
+                let base64_password = authorization.split_whitespace().nth(1).unwrap();
+                let raw_password = BASE64_STANDARD.decode(base64_password).unwrap();
+                let password = std::str::from_utf8(&raw_password).unwrap().trim_end();
+
+                if password != settings.password {
+                    return Response::text("invalid password").with_status_code(401);
                 }
 
                 let mut body = request
