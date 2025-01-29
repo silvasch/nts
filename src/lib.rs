@@ -1,4 +1,5 @@
 use base64::prelude::*;
+use jiff::Timestamp;
 
 mod error;
 use std::io::Read;
@@ -9,7 +10,8 @@ mod settings;
 use rouille::Response;
 use settings::Settings;
 
-const RAW_SCRIPT: &str = include_str!("../scripts/write.sh");
+const RAW_WRITE_SCRIPT: &str = include_str!("../scripts/write.sh");
+const RAW_READ_SCRIPT: &str = include_str!("../scripts/read.sh");
 
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
@@ -46,12 +48,42 @@ pub fn run() -> Result<(), Error> {
                     .join(jiff::Timestamp::now().as_millisecond().to_string())
                     .with_extension("txt");
 
-                std::fs::create_dir_all(&file_name.parent().unwrap()).unwrap();
+                std::fs::create_dir_all(file_name.parent().unwrap()).unwrap();
                 std::fs::write(file_name, note)
                     .map_err(Error::WriteNote)
                     .unwrap();
 
                 Response::text("ok")
+            }
+            "/get" => {
+                if request.method() != "GET" {
+                    return Response::text("this route only allows GET requests.")
+                        .with_status_code(405);
+                }
+
+                let mut text = String::new();
+
+                let mut files = vec![];
+
+                for file in std::fs::read_dir(&data_dir).unwrap() {
+                    files.push(file.unwrap().path());
+                }
+
+                files.sort_unstable();
+
+                for file in files {
+                    let contents = std::fs::read_to_string(&file).unwrap();
+                    text.push_str(&format!(
+                        "{}\n{}\n\n",
+                        Timestamp::from_millisecond(
+                            file.file_stem().unwrap().to_string_lossy().parse().unwrap()
+                        )
+                        .unwrap(),
+                        contents
+                    ));
+                }
+
+                Response::text(text)
             }
             "/write" => {
                 if request.method() != "GET" {
@@ -59,7 +91,17 @@ pub fn run() -> Result<(), Error> {
                         .with_status_code(405);
                 }
 
-                let script = RAW_SCRIPT.replace("{{HOST}}", &settings.external_url);
+                let script = RAW_WRITE_SCRIPT.replace("{{HOST}}", &settings.external_url);
+
+                Response::text(script)
+            }
+            "/read" => {
+                if request.method() != "GET" {
+                    return Response::text("this route only allows GET requests.")
+                        .with_status_code(405);
+                }
+
+                let script = RAW_READ_SCRIPT.replace("{{HOST}}", &settings.external_url);
 
                 Response::text(script)
             }
