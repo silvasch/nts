@@ -7,7 +7,7 @@ use settings::Settings;
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
 
-    dbg!(&settings);
-
-    Ok(())
+    rouille::start_server(format!("0.0.0.0:{}", settings.port), move |_request| {
+        rouille::Response::text("Hello, World!")
+    });
 }
