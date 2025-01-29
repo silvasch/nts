@@ -7,6 +7,8 @@ mod settings;
 use rouille::Response;
 use settings::Settings;
 
+const RAW_SCRIPT: &str = include_str!("../script.sh");
+
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
 
@@ -30,6 +32,16 @@ pub fn run() -> Result<(), Error> {
                 println!("{}", note);
 
                 Response::text("ok")
+            }
+            "/script" => {
+                if request.method() != "GET" {
+                    return Response::text("this route only allows GET requests.")
+                        .with_status_code(405);
+                }
+
+                let script = RAW_SCRIPT.replace("{{HOST}}", &settings.external_url);
+
+                Response::text(script)
             }
             route => {
                 Response::text(format!("'{}' is not a valid route.", route)).with_status_code(404)
