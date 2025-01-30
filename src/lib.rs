@@ -1,5 +1,5 @@
 use base64::prelude::*;
-use jiff::Timestamp;
+use jiff::{tz::TimeZone, Timestamp};
 
 mod error;
 use std::io::Read;
@@ -77,7 +77,9 @@ pub fn run() -> Result<(), Error> {
                         Timestamp::from_millisecond(
                             file.file_stem().unwrap().to_string_lossy().parse().unwrap()
                         )
-                        .unwrap(),
+                        .unwrap()
+                        .to_zoned(TimeZone::system())
+                        .strftime("%a %b %e %I:%M:%S %Y"),
                         contents
                     ));
                 }
