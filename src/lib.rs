@@ -38,6 +38,10 @@ pub fn run() -> Result<(), Error> {
                 body.read_to_string(&mut note)
                     .map_err(Error::BodyRead)
                     .unwrap();
+                note = note.trim().to_string();
+                if note.is_empty() {
+                    return Response::text("note is empty - it won't be saved");
+                }
 
                 let file_name = data_dir
                     .join(jiff::Timestamp::now().as_millisecond().to_string())
