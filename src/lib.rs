@@ -17,6 +17,7 @@ pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
 
     let data_dir = xdg::BaseDirectories::with_prefix("nts")?.get_data_home();
+    std::fs::create_dir_all(&data_dir).unwrap();
 
     rouille::start_server(
         format!("0.0.0.0:{}", settings.port),
