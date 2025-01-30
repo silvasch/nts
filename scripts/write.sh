@@ -7,7 +7,7 @@ PASSWORD=$(echo $PASSWORD | base64)
 
 rm -f .nts-note
 touch .nts-note
-$EDITOR .nts-note
+${EDITOR:-nano} .nts-note
 NOTE=$(cat .nts-note)
 rm .nts-note
 
