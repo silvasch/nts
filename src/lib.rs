@@ -7,7 +7,7 @@ use std::io::Read;
 pub use error::Error;
 
 mod settings;
-use rouille::Response;
+use rouille::{Request, Response};
 use settings::Settings;
 
 const RAW_WRITE_SCRIPT: &str = include_str!("../scripts/write.sh");
@@ -27,12 +27,7 @@ pub fn run() -> Result<(), Error> {
                         .with_status_code(405);
                 }
 
-                let authorization = request.header("Authorization").unwrap();
-                let base64_password = authorization.split_whitespace().nth(1).unwrap();
-                let raw_password = BASE64_STANDARD.decode(base64_password).unwrap();
-                let password = std::str::from_utf8(&raw_password).unwrap().trim_end();
-
-                if password != settings.password {
+                if !authenticate(&settings.password, request) {
                     return Response::text("invalid password").with_status_code(401);
                 }
 
@@ -59,6 +54,10 @@ pub fn run() -> Result<(), Error> {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
                         .with_status_code(405);
+                }
+
+                if !authenticate(&settings.password, request) {
+                    return Response::text("invalid password").with_status_code(401);
                 }
 
                 let mut text = String::new();
@@ -110,4 +109,16 @@ pub fn run() -> Result<(), Error> {
             }
         },
     );
+}
+
+fn authenticate(expected_password: &str, request: &Request) -> bool {
+    let authorization = match request.header("Authorization") {
+        Some(authorization) => authorization,
+        None => return false,
+    };
+    let base64_password = authorization.split_whitespace().nth(1).unwrap();
+    let raw_password = BASE64_STANDARD.decode(base64_password).unwrap();
+    let password = std::str::from_utf8(&raw_password).unwrap().trim_end();
+
+    password == expected_password
 }
