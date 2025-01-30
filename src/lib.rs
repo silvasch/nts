@@ -73,14 +73,14 @@ pub fn run() -> Result<(), Error> {
                 for file in files {
                     let contents = std::fs::read_to_string(&file).unwrap();
                     text.push_str(&format!(
-                        "{}\n{}\n\n",
+                        "{}\n=====\n> {}\n\n",
                         Timestamp::from_millisecond(
                             file.file_stem().unwrap().to_string_lossy().parse().unwrap()
                         )
                         .unwrap()
                         .to_zoned(TimeZone::system())
                         .strftime("%a %b %e %I:%M:%S %Y"),
-                        contents
+                        contents.replace('\n', "\n> ")
                     ));
                 }
 
