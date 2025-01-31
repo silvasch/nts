@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      packages: write
+      contents: read
       id-token: write
       attestations: write
     
@@ -26,7 +28,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.TOKEN }}
+          password: ${{ github.token }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
