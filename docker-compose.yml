@@ -6,7 +6,4 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
-    environment:
-      - TZ=Europe/Zurich
-      - NTS_EXTERNAL_URL=http://localhost:8080
-      - NTS_PASSWORD=asdfasdf
+    env_file: .env

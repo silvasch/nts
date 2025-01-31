@@ -11,11 +11,7 @@ pub struct Settings {
 
 impl Settings {
     pub fn new() -> Result<Self, Error> {
-        let base_dirs = xdg::BaseDirectories::with_prefix("nts")?;
-        let config_file = base_dirs.get_config_file("config.toml");
-
         let settings = config::Config::builder()
-            .add_source(config::File::with_name(config_file.to_str().unwrap()).required(false))
             .add_source(config::Environment::with_prefix("NTS"))
             .build()?;
 
