@@ -1,9 +1,8 @@
 services:
   nts:
     container_name: nts
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/silvasch/nts:main
+    build: .
     ports:
       - 8080:8080
     env_file: .env
