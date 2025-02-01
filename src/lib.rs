@@ -10,8 +10,8 @@ mod settings;
 use rouille::{Request, Response};
 use settings::Settings;
 
-const RAW_WRITE_SCRIPT: &str = include_str!("../scripts/write.sh");
-const RAW_READ_SCRIPT: &str = include_str!("../scripts/read.sh");
+const RAW_WRITE_SCRIPT: &str = include_str!("../scripts/new.sh");
+const RAW_READ_SCRIPT: &str = include_str!("../scripts/get.sh");
 
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
@@ -21,7 +21,7 @@ pub fn run() -> Result<(), Error> {
     rouille::start_server(
         format!("0.0.0.0:{}", settings.port),
         move |request| match request.url().as_str() {
-            "/new" => {
+            "/api/new" => {
                 if request.method() != "POST" {
                     return Response::text("this route only allows POST requests.")
                         .with_status_code(405);
@@ -55,7 +55,7 @@ pub fn run() -> Result<(), Error> {
 
                 Response::text("ok")
             }
-            "/get" => {
+            "/api/get" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
                         .with_status_code(405);
@@ -91,7 +91,7 @@ pub fn run() -> Result<(), Error> {
 
                 Response::text(text)
             }
-            "/write" => {
+            "/new" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
                         .with_status_code(405);
@@ -101,7 +101,7 @@ pub fn run() -> Result<(), Error> {
 
                 Response::text(script)
             }
-            "/read" => {
+            "/get" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
                         .with_status_code(405);

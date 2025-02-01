@@ -7,5 +7,5 @@ PASSWORD=$(echo $PASSWORD | base64)
 
 echo ""
 
-curl -s -H "Authorization: Basic $PASSWORD" $HOST/get | ${PAGER:-less}
+curl -s -H "Authorization: Basic $PASSWORD" $HOST/api/get | ${PAGER:-less}
 echo ""
