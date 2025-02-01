@@ -74,6 +74,7 @@ pub fn run() -> Result<(), Error> {
                 }
 
                 files.sort_unstable();
+                files.reverse();
 
                 for file in files {
                     let contents = std::fs::read_to_string(&file).unwrap();
