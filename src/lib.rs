@@ -92,6 +92,18 @@ pub fn run() -> Result<(), Error> {
 
                 Response::text(text)
             }
+            "/api/check-pwd" => {
+                if request.method() != "POST" {
+                    return Response::text("this route only allows POST requests.")
+                        .with_status_code(405);
+                }
+
+                if !authenticate(&settings.password, request) {
+                    Response::text("invalid password").with_status_code(401)
+                } else {
+                    Response::text("ok")
+                }
+            }
             "/new" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
