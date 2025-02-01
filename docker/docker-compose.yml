@@ -1,0 +1,16 @@
+services:
+  nts:
+    container_name: nts
+    image: ghcr.io/silvasch/nts:main
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Europe/Zurich
+
+      - NTS_EXTERNAL_URL=http://localhost:8080
+      - NTS_PASSWORD=asdfasdf
+      - NTS_PORT=8080
+      - NTS_DATA_DIR=/data
+    volumes:
+      - ./nts-data:/data
+    restart: unless-stopped
