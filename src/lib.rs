@@ -16,8 +16,7 @@ const RAW_READ_SCRIPT: &str = include_str!("../scripts/read.sh");
 pub fn run() -> Result<(), Error> {
     let settings = Settings::new()?;
 
-    let data_dir = xdg::BaseDirectories::with_prefix("nts")?.get_data_home();
-    std::fs::create_dir_all(&data_dir).unwrap();
+    std::fs::create_dir_all(&settings.data_dir).unwrap();
 
     rouille::start_server(
         format!("0.0.0.0:{}", settings.port),
@@ -44,7 +43,8 @@ pub fn run() -> Result<(), Error> {
                     return Response::text("note is empty - it won't be saved");
                 }
 
-                let file_name = data_dir
+                let file_name = &settings
+                    .data_dir
                     .join(jiff::Timestamp::now().as_millisecond().to_string())
                     .with_extension("txt");
 
@@ -69,7 +69,7 @@ pub fn run() -> Result<(), Error> {
 
                 let mut files = vec![];
 
-                for file in std::fs::read_dir(&data_dir).unwrap() {
+                for file in std::fs::read_dir(&settings.data_dir).unwrap() {
                     files.push(file.unwrap().path());
                 }
 
