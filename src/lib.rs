@@ -84,7 +84,7 @@ pub fn run() -> Result<(), Error> {
                         )
                         .unwrap()
                         .to_zoned(TimeZone::system())
-                        .strftime("%a %b %e %I:%M:%S %Y"),
+                        .strftime("%a %b %d %H:%M:%S %Y"),
                         contents.replace('\n', "\n> ")
                     ));
                 }
