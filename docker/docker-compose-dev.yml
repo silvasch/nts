@@ -7,12 +7,8 @@ services:
       dockerfile: ./docker/Dockerfile
     ports:
       - 8080:8080
+    env_file: ../.env
     environment:
-      - TZ=Europe/Zurich
-
-      - NTS_EXTERNAL_URL=http://localhost:8080
-      - NTS_PASSWORD=asdfasdf
-      - NTS_PORT=8080
       - NTS_DATA_DIR=/data
     volumes:
       - ./nts-data:/data
