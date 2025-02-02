@@ -1,5 +1,6 @@
-fn main() {
-    if let Err(e) = nts::run() {
+#[tokio::main]
+async fn main() {
+    if let Err(e) = nts::run().await {
         eprintln!("{}", e);
     }
 }

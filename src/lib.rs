@@ -1,5 +1,5 @@
 use anyhow::Result;
 
-pub fn run() -> Result<()> {
+pub async fn run() -> Result<()> {
     Ok(())
 }
