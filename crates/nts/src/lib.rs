@@ -1,5 +1,10 @@
 use anyhow::Result;
-use axum::{http::StatusCode, middleware, response::IntoResponse, routing::get, Router};
+use axum::{
+    http::StatusCode,
+    middleware,
+    routing::{get, post},
+    Router,
+};
 use axum_extra::{
     headers::{authorization::Basic, Authorization},
     TypedHeader,
@@ -16,6 +21,7 @@ pub async fn run() -> Result<()> {
 
     let app = Router::new()
         .route("/api/check-pwd", get(check_password))
+        .route("/api/new", post(new_note))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
 
@@ -27,10 +33,49 @@ pub async fn run() -> Result<()> {
     Ok(())
 }
 
+async fn new_note(
+    state: axum::extract::State<State>,
+    creds: Option<TypedHeader<Authorization<Basic>>>,
+    body: String,
+) -> (StatusCode, String) {
+    let (status_code, msg) = check_password(state.clone(), creds).await;
+
+    if status_code != StatusCode::OK {
+        return (status_code, msg.to_string());
+    }
+
+    let notes_dir = state.0.data_dir.join("notes");
+
+    let file_name = state
+        .0
+        .data_dir
+        .join("notes")
+        .join(jiff::Timestamp::now().as_millisecond().to_string())
+        .with_extension("txt");
+
+    if let Err(e) = std::fs::create_dir_all(notes_dir) {
+        tracing::error!("{:?}", e);
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "failed to create notes directory".to_string(),
+        );
+    }
+
+    if let Err(e) = std::fs::write(file_name, body) {
+        tracing::error!("{:?}", e);
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "failed to write note.".to_string(),
+        );
+    }
+
+    (StatusCode::OK, "ok".to_string())
+}
+
 async fn check_password(
     axum::extract::State(state): axum::extract::State<State>,
     creds: Option<TypedHeader<Authorization<Basic>>>,
-) -> impl IntoResponse {
+) -> (StatusCode, &'static str) {
     if let Some(password_hash) = state.password_hash {
         match creds {
             Some(creds) if creds.password().trim() == password_hash => (StatusCode::OK, "ok"),

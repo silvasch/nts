@@ -9,6 +9,7 @@ edition = "2021"
 anyhow = "1.0.95"
 axum = "0.8.1"
 axum-extra = { version = "0.10.0", features = ["typed-header"] }
+jiff = "0.1.29"
 tokio = { version = "1.43.0", features = ["full"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
