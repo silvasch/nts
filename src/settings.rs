@@ -11,6 +11,8 @@ pub struct Settings {
     pub password: String,
 
     pub data_dir: PathBuf,
+
+    pub template: String,
 }
 
 impl Settings {
@@ -26,12 +28,14 @@ impl Settings {
             .get_string("data_dir")
             .map(|v| Path::new(&v).to_path_buf())
             .unwrap_or(xdg::BaseDirectories::with_prefix("nts")?.get_data_home());
+        let template = settings.get_string("template").unwrap_or_default();
 
         Ok(Self {
             port: port as u16,
             external_url,
             password,
             data_dir,
+            template,
         })
     }
 }

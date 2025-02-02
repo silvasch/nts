@@ -13,8 +13,10 @@ if [ "$RESP" != "ok" ]; then
   exit 1
 fi
 
+TEMPLATE=$(curl -s -H "Authorization: Basic $PASSWORD" $HOST/api/get-template)
+
 rm -f .nts-note
-touch .nts-note
+echo $TEMPLATE > .nts-note
 ${EDITOR:-nano} .nts-note
 NOTE=$(cat .nts-note)
 rm .nts-note

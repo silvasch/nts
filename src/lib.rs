@@ -104,6 +104,18 @@ pub fn run() -> Result<(), Error> {
                     Response::text("ok")
                 }
             }
+            "/api/get-template" => {
+                if request.method() != "GET" {
+                    return Response::text("this route only allows GET requests.")
+                        .with_status_code(405);
+                }
+
+                if !authenticate(&settings.password, request) {
+                    return Response::text("invalid password").with_status_code(401);
+                }
+
+                Response::text(&settings.template)
+            }
             "/new" => {
                 if request.method() != "GET" {
                     return Response::text("this route only allows GET requests.")
