@@ -1,29 +1,29 @@
 # nts
 
 A quick and simple notes service. It works by hosting two bash
-scripts under "/read" and "/write" that can by executed on any
-computer with `curl` installed.
+scripts under "/new" and "/get" that can by executed on any
+computer with `curl` and `sh` installed.
 
 ## Usage
 
 > [!NOTE]
 > This section assumes `nts` is hosted under `https://nts.example.com`
 
-To create a note, run `curl -s https://nts.example.com/write | sh`. It will
+To create a note, run `curl -s https://nts.example.com/new | sh`. It will
 ask you for the password and the open your default text editor to enter your
 note.
 
-To read your notes, run `curl -s https://nts.example.com/read | sh`.
+To read your notes, run `curl -s https://nts.example.com/get| sh`.
 
 ## Setup
 
 ### Using Docker (recommended)
 
-1. Clone this repository:
+1. Download `docker-compose.yml` and `.env`:
 
 ```bash
-git clone https://github.com/silvasch/nts
-cd nts
+curl -s https://raw.githubusercontent.com/silvasch/nts/refs/heads/main/docker/docker-compose.yml > docker-compose.yml
+curl -s https://raw.githubusercontent.com/silvasch/nts/refs/heads/main/docker/example.env > .env
 ```
 
 2. Edit your settings in `.env`. Read the comments in the file to
