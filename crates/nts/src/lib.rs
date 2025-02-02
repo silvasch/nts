@@ -22,6 +22,8 @@ pub async fn run() -> Result<()> {
     let state = State::new()?;
 
     let app = Router::new()
+        .route("/new", get(new_script))
+        .route("/get", get(get_script))
         .route("/api/check-pwd", get(check_password))
         .route("/api/new", post(new_note))
         .route("/api/get", get(get_notes))
@@ -34,6 +36,14 @@ pub async fn run() -> Result<()> {
 
     axum::serve(listener, app).await?;
     Ok(())
+}
+
+async fn new_script(state: axum::extract::State<State>) -> String {
+    state.0.new_script
+}
+
+async fn get_script(state: axum::extract::State<State>) -> String {
+    state.0.get_script
 }
 
 async fn new_note(
@@ -127,7 +137,7 @@ async fn get_notes(
         .strftime("%a %b %d %H:%M:%S %Y");
 
         output.push_str(&format!(
-            "{}\n=====\n>{}\n\n",
+            "{}\n=====\n> {}\n\n",
             timestamp,
             file_contents.replace('\n', "\n> "),
         ));
