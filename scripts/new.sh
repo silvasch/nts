@@ -13,5 +13,5 @@ ${EDITOR:-nano} .nts-note
 NOTE=$(cat .nts-note)
 rm .nts-note
 
-curl -s -X POST -d "$NOTE" -H "Authorization: Basic $AUTH" localhost:9112/api/new
+curl -vs -X POST -d "$NOTE" -H "Authorization: Basic $AUTH" localhost:9112/api/new
 echo ""

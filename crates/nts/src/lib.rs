@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use anyhow::Result;
 use axum::{
     http::StatusCode,
@@ -22,6 +24,7 @@ pub async fn run() -> Result<()> {
     let app = Router::new()
         .route("/api/check-pwd", get(check_password))
         .route("/api/new", post(new_note))
+        .route("/api/get", get(get_notes))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
 
@@ -70,6 +73,67 @@ async fn new_note(
     }
 
     (StatusCode::OK, "ok".to_string())
+}
+
+async fn get_notes(
+    state: axum::extract::State<State>,
+    creds: Option<TypedHeader<Authorization<Basic>>>,
+) -> (StatusCode, String) {
+    let (status_code, msg) = check_password(state.clone(), creds).await;
+
+    if status_code != StatusCode::OK {
+        return (status_code, msg.to_string());
+    }
+
+    let notes_dir = state.0.data_dir.join("notes");
+
+    let mut output = String::new();
+
+    let mut files: Vec<PathBuf> = match std::fs::read_dir(notes_dir)
+        .unwrap()
+        .map(|dir_entry| dir_entry.map(|dir_entry| dir_entry.path()))
+        .collect::<Result<Vec<PathBuf>, std::io::Error>>()
+    {
+        Ok(files) => files,
+        Err(e) => {
+            tracing::error!("{:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "failed to list notes in notes dir".to_string(),
+            );
+        }
+    };
+    files.sort_unstable();
+    files.reverse();
+
+    for file in &files {
+        let file_contents = match std::fs::read_to_string(file) {
+            Ok(file_contents) => file_contents,
+            Err(e) => {
+                tracing::error!("{:?}", e);
+                return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string());
+            }
+        };
+
+        let timestamp = jiff::Timestamp::from_millisecond(
+            file.file_stem()
+                .expect("files created in the directory by this program should always have a stem")
+                .to_string_lossy()
+                .parse()
+                .unwrap(),
+        )
+        .unwrap()
+        .to_zoned(jiff::tz::TimeZone::system())
+        .strftime("%a %b %d %H:%M:%S %Y");
+
+        output.push_str(&format!(
+            "{}\n=====\n>{}\n\n",
+            timestamp,
+            file_contents.replace('\n', "\n> "),
+        ));
+    }
+
+    (StatusCode::OK, output)
 }
 
 async fn check_password(
