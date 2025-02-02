@@ -1,7 +1,7 @@
 FROM rust:1.77 AS builder
 WORKDIR /usr/src/nts
 COPY . .
-RUN cargo install --path .
+RUN cargo install --path ./crates/nts
 
 FROM debian:bookworm-slim
 RUN apt update

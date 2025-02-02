@@ -1,0 +1,15 @@
+[package]
+name = "nts"
+version = "0.2.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.95"
+axum = "0.8.1"
+axum-extra = { version = "0.10.0", features = ["typed-header"] }
+tokio = { version = "1.43.0", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+xdg = "2.5.2"

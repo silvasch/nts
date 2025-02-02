@@ -8,6 +8,8 @@ services:
     ports:
       - 9112:9112
     env_file: ../.env
+    environment:
+      - NTS_DATA_DIR=/data
     volumes:
-      - ./nts-data:/data
+      - ../nts-data:/data
     restart: unless-stopped
