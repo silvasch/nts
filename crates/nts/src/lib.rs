@@ -18,7 +18,11 @@ pub async fn run() -> Result<()> {
         .route("/api/check-pwd", get(check_password))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:9112").await?;
+
+    let address = get_address()?;
+    tracing::info!("binding to {}", address);
+    let listener = tokio::net::TcpListener::bind(get_address()?).await?;
+
     axum::serve(listener, app).await?;
     Ok(())
 }
@@ -36,4 +40,12 @@ async fn check_password(
     } else {
         (StatusCode::OK, "ok")
     }
+}
+
+fn get_address() -> Result<String> {
+    let host = std::env::var("NTS_HOST").unwrap_or("0.0.0.0".to_string());
+    let port = std::env::var("NTS_PORT")
+        .unwrap_or("9112".to_string())
+        .parse::<u16>()?;
+    Ok(format!("{}:{}", host, port))
 }
