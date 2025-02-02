@@ -3,7 +3,7 @@ services:
     container_name: nts
     image: ghcr.io/silvasch/nts:latest
     ports:
-      - 8080:8080
+      - 9112:9112
     env_file: .env
     volumes:
       - ./nts-data:/data

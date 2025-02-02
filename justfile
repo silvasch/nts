@@ -1,5 +1,5 @@
 dev-up:
-    docker compose -f docker/docker-compose-dev.yml up -d --pull never
+    docker compose -f docker/docker-compose-dev.yml up -d --pull never --build
 
 dev-down:
     docker compose -f docker/docker-compose-dev.yml down
