@@ -12,3 +12,4 @@ axum-extra = { version = "0.10.0", features = ["typed-header"] }
 tokio = { version = "1.43.0", features = ["full"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+xdg = "2.5.2"
