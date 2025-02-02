@@ -1,7 +1,7 @@
 services:
   nts:
     container_name: nts
-    image: ghcr.io/silvasch/nts:main
+    image: ghcr.io/silvasch/nts:latest
     ports:
       - 8080:8080
     env_file: .env
