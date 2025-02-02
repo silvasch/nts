@@ -1,3 +1,4 @@
 [workspace]
 resolver = "2"
-members = ["crates/nts"]
+members = ["crates/nts", "crates/nts_set_pwd"]
+default-members = ["crates/nts"]

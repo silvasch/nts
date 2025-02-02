@@ -15,7 +15,7 @@ pub async fn run() -> Result<()> {
     let state = State::new()?;
 
     let app = Router::new()
-        .route("/", get(hello))
+        .route("/check-pwd", get(check_password))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:9112").await?;
@@ -23,11 +23,11 @@ pub async fn run() -> Result<()> {
     Ok(())
 }
 
-async fn hello(
+async fn check_password(
     axum::extract::State(state): axum::extract::State<State>,
     creds: Option<TypedHeader<Authorization<Basic>>>,
 ) -> impl IntoResponse {
-    if let Some(password_hash) = state.password {
+    if let Some(password_hash) = state.password_hash {
         match creds {
             Some(creds) if creds.password().trim() == password_hash => (StatusCode::OK, "ok"),
             Some(_) => (StatusCode::UNAUTHORIZED, "invalid password"),

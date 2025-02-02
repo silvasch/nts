@@ -6,3 +6,6 @@ dev-down:
 
 dev-logs:
     docker compose -f docker/docker-compose-dev.yml logs -f
+
+dev-exec:
+    docker compose -f docker/docker-compose-dev.yml exec nts sh

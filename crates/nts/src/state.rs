@@ -9,7 +9,7 @@ const TARGET: &str = "state";
 pub struct State {
     pub data_dir: PathBuf,
 
-    pub password: Option<String>,
+    pub password_hash: Option<String>,
 }
 
 impl State {
@@ -20,12 +20,15 @@ impl State {
 
         info!(target: TARGET, "data_dir = {}", data_dir.display());
 
-        let password = std::fs::read_to_string(data_dir.join("pwd"))
+        let password_hash = std::fs::read_to_string(data_dir.join("pwd"))
             .ok()
             .map(|v| v.trim().to_string());
 
-        info!(target: TARGET, "password = {:?}", password.clone().map(|_| "..."));
+        info!(target: TARGET, "password_hash = {:?}", password_hash);
 
-        Ok(Self { data_dir, password })
+        Ok(Self {
+            data_dir,
+            password_hash,
+        })
     }
 }
