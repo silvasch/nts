@@ -15,7 +15,7 @@ pub async fn run() -> Result<()> {
     let state = State::new()?;
 
     let app = Router::new()
-        .route("/check-pwd", get(check_password))
+        .route("/api/check-pwd", get(check_password))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:9112").await?;
