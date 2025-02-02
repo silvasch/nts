@@ -32,6 +32,9 @@ are important to look at.
 
 3. Start the service using `docker compose up -d`.
 
+4. Set your password by executing `docker compose exec nts nts_set_pwd` and
+entering it at the prompt.
+
 ## Security
 
 This project does not follow high security standards, and probably never will.
