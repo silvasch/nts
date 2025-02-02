@@ -23,11 +23,11 @@ To read your notes, run `curl -s https://nts.example.com/get| sh`.
 
 ```bash
 curl -s https://raw.githubusercontent.com/silvasch/nts/refs/heads/main/docker/docker-compose.yml > docker-compose.yml
-curl -s https://raw.githubusercontent.com/silvasch/nts/refs/heads/main/docker/example.env > .env
+curl -s https://raw.githubusercontent.com/silvasch/nts/refs/heads/main/docker/.env.example > .env
 ```
 
 2. Edit your settings in `.env`. Read the comments in the file to
-find out what they do. Variables marked with `!!! Attention !!!`
+find out what they do. Variables marked with `!!! ATTENTION !!!`
 are important to look at.
 
 3. Start the service using `docker compose up -d`.
