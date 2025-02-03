@@ -1,7 +1,4 @@
-use std::{
-    net::ToSocketAddrs,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use tracing::info;
@@ -32,6 +29,9 @@ impl State {
         let password_hash = std::fs::read_to_string(data_dir.join("pwd"))
             .ok()
             .map(|v| v.trim().to_string());
+        if password_hash.is_none() {
+            info!("no password set; every request will be rejected. apply one using 'nts_set_pwd'");
+        }
 
         let external_url =
             std::env::var("NTS_EXTERNAL_URL").unwrap_or("http://localhost:9112".to_string());
