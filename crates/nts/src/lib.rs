@@ -135,13 +135,7 @@ async fn get_notes(
             }
         };
 
-        output.push_str(&format!(
-            "{}\n=====\n> {}\n\n",
-            note.timestamp
-                .to_zoned(jiff::tz::TimeZone::system())
-                .strftime("%a %b %d %H:%M:%S %Y"),
-            note.contents.replace('\n', "\n> "),
-        ));
+        output.push_str(&format!("{}\n", note));
     }
 
     (StatusCode::OK, output)
