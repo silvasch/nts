@@ -41,3 +41,21 @@ impl Note {
         Ok(())
     }
 }
+
+impl std::fmt::Display for Note {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(
+            f,
+            "{}",
+            self.timestamp
+                .to_zoned(jiff::tz::TimeZone::system())
+                .strftime("%a %b %d %H:%M:%S %Y")
+        )?;
+
+        for line in self.contents.lines() {
+            writeln!(f, "> {}", line)?;
+        }
+
+        Ok(())
+    }
+}
