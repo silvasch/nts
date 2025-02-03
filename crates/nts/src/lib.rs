@@ -106,8 +106,17 @@ async fn get_notes(
 
     let mut output = String::new();
 
-    let mut files: Vec<PathBuf> = match std::fs::read_dir(notes_dir)
-        .unwrap()
+    let read_dir = match std::fs::read_dir(notes_dir) {
+        Ok(read_dir) => read_dir,
+        Err(e) => {
+            tracing::error!("{:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "failed tolist notes in notes dir".to_string(),
+            );
+        }
+    };
+    let mut files: Vec<PathBuf> = match read_dir
         .map(|dir_entry| dir_entry.map(|dir_entry| dir_entry.path()))
         .collect::<Result<Vec<PathBuf>, std::io::Error>>()
     {
@@ -128,20 +137,37 @@ async fn get_notes(
             Ok(file_contents) => file_contents,
             Err(e) => {
                 tracing::error!("{:?}", e);
-                return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string());
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "failed to read a note".to_string(),
+                );
             }
         };
 
-        let timestamp = jiff::Timestamp::from_millisecond(
-            file.file_stem()
-                .expect("files created in the directory by this program should always have a stem")
-                .to_string_lossy()
-                .parse()
-                .unwrap(),
-        )
-        .unwrap()
-        .to_zoned(jiff::tz::TimeZone::system())
-        .strftime("%a %b %d %H:%M:%S %Y");
+        let timestamp: i64 = match file
+            .file_stem()
+            .expect("files created in the directory by this program should always have a stem")
+            .to_string_lossy()
+            .parse()
+        {
+            Ok(timestamp) => timestamp,
+            Err(_) => continue,
+        };
+
+        let timestamp = match jiff::Timestamp::from_millisecond(timestamp) {
+            Ok(timestamp) => timestamp,
+            Err(e) => {
+                tracing::error!("{:?}", e);
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "failed to create a timestamp from a file".to_string(),
+                );
+            }
+        };
+
+        let timestamp = timestamp
+            .to_zoned(jiff::tz::TimeZone::system())
+            .strftime("%a %b %d %H:%M:%S %Y");
 
         output.push_str(&format!(
             "{}\n=====\n> {}\n\n",
