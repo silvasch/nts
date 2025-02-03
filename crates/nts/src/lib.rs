@@ -170,7 +170,7 @@ async fn check_password(
     } else {
         (
             StatusCode::UNAUTHORIZED,
-            "no password is set; use 'nts_set_pwd' to apply one.",
+            "no password is set; use 'nts_set_pwd' on the server to apply one",
         )
     }
 }

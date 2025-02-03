@@ -7,7 +7,7 @@ echo ""
 
 RESP=$(curl -s -H "Authorization: Basic $AUTH" localhost:9112/api/check-pwd)
 if [ "$RESP" != "ok" ]; then
-  echo "invalid password"
+  echo "$RESP"
   exit 1
 fi
 
