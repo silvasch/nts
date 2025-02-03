@@ -31,6 +31,8 @@
             rust-analyzer
             clippy
             rustfmt
+
+            git-cliff
           ];
         };
 
