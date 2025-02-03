@@ -11,7 +11,10 @@ if [ "$RESP" != "ok" ]; then
   exit 1
 fi
 
+TEMPLATE=$(curl -s localhost:9112/api/get-template)
+
 rm -rf .nts-note
+echo "$TEMPLATE" > .nts-note
 ${EDITOR:-nano} .nts-note
 NOTE=$(cat .nts-note)
 rm .nts-note

@@ -16,6 +16,8 @@ pub struct State {
 
     pub external_url: String,
 
+    pub template: String,
+
     pub new_script: String,
     pub get_script: String,
 }
@@ -36,17 +38,21 @@ impl State {
         let external_url =
             std::env::var("NTS_EXTERNAL_URL").unwrap_or("http://localhost:9112".to_string());
 
+        let template = std::env::var("NTS_TEMPLATE").unwrap_or_default();
+
         let new_script = NEW_SCRIPT.replace("localhost:9112", &external_url);
         let get_script = GET_SCRIPT.replace("localhost:9112", &external_url);
 
         info!(target: TARGET, "data_dir = {}", data_dir.display());
         info!(target: TARGET, "password_hash = {:?}", password_hash);
         info!(target: TARGET, "external_url = {}", external_url);
+        info!(target: TARGET, "template = {}", template);
 
         Ok(Self {
             data_dir,
             password_hash,
             external_url,
+            template,
             new_script,
             get_script,
         })

@@ -24,9 +24,10 @@ pub async fn run() -> Result<()> {
     let app = Router::new()
         .route("/new", get(new_script))
         .route("/get", get(get_script))
-        .route("/api/check-pwd", get(check_password))
         .route("/api/new", post(new_note))
         .route("/api/get", get(get_notes))
+        .route("/api/check-pwd", get(check_password))
+        .route("/api/get-template", get(get_template))
         .layer(middleware::from_fn(tracing_middleware))
         .with_state(state);
 
@@ -144,6 +145,10 @@ async fn get_notes(
     }
 
     (StatusCode::OK, output)
+}
+
+async fn get_template(axum::extract::State(state): axum::extract::State<State>) -> String {
+    state.template
 }
 
 async fn check_password(
