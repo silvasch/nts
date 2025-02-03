@@ -93,50 +93,41 @@ async fn get_notes(
 
     let notes_dir = state.0.data_dir.join("notes");
 
-    let mut output = String::new();
-
-    let read_dir = match std::fs::read_dir(notes_dir) {
-        Ok(read_dir) => read_dir,
-        Err(e) => {
-            tracing::error!("{:?}", e);
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "failed to list notes in notes dir".to_string(),
-            );
-        }
-    };
-
-    let mut files: Vec<PathBuf> = match read_dir
-        .map(|dir_entry| dir_entry.map(|dir_entry| dir_entry.path()))
-        .collect::<Result<Vec<PathBuf>, std::io::Error>>()
-    {
+    let mut file_paths: Vec<PathBuf> = match std::fs::read_dir(notes_dir).and_then(|read_dir| {
+        read_dir
+            .map(|dir_entry_result| dir_entry_result.map(|dir_entry| dir_entry.path()))
+            .collect::<Result<Vec<PathBuf>, std::io::Error>>()
+    }) {
         Ok(files) => files,
         Err(e) => {
             tracing::error!("{:?}", e);
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "failed to list notes in notes dir".to_string(),
+                "failed to list notes".to_string(),
             );
         }
     };
+    file_paths.sort_unstable();
+    file_paths.reverse();
 
-    files.sort_unstable();
-    files.reverse();
-
-    for file in &files {
-        let note = match Note::from_filepath(file) {
-            Ok(note) => note,
-            Err(e) => {
-                tracing::error!("{:?}", e);
-                return (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "failed to read a note from a file".to_string(),
-                );
-            }
-        };
-
-        output.push_str(&format!("{}\n", note));
-    }
+    let output = match file_paths
+        .into_iter()
+        .map(|file_path| Note::from_filepath(&file_path))
+        .collect::<Result<Vec<Note>>>()
+        .map(|notes| {
+            notes.into_iter().fold(String::new(), |output, note| {
+                format!("{}\n{}", output, note)
+            })
+        }) {
+        Ok(output) => output,
+        Err(e) => {
+            tracing::error!("{:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "failed to read a note".to_string(),
+            );
+        }
+    };
 
     (StatusCode::OK, output)
 }
