@@ -35,6 +35,8 @@ are important to look at.
 4. Set your password by executing `docker compose exec nts nts_set_pwd` and
 entering it at the prompt.
 
+4. Restart the service using `docker compose restart` to apply your password.
+
 ## Security
 
 This project does not follow high security standards, and probably never will.
