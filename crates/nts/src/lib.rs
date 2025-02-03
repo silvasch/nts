@@ -52,6 +52,12 @@ async fn new_note(
     creds: Option<TypedHeader<Authorization<Basic>>>,
     body: String,
 ) -> (StatusCode, String) {
+    let body = body.trim();
+
+    if body.is_empty() {
+        return (StatusCode::OK, "note was empty".to_string());
+    }
+
     let (status_code, msg) = check_password(state.clone(), creds).await;
 
     if status_code != StatusCode::OK {
