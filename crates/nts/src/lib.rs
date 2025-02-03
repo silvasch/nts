@@ -12,6 +12,9 @@ use axum_extra::{
     TypedHeader,
 };
 
+mod note;
+pub(crate) use note::Note;
+
 mod state;
 pub(crate) use state::State;
 
@@ -66,26 +69,12 @@ async fn new_note(
 
     let notes_dir = state.0.data_dir.join("notes");
 
-    let file_name = state
-        .0
-        .data_dir
-        .join("notes")
-        .join(jiff::Timestamp::now().as_millisecond().to_string())
-        .with_extension("txt");
-
-    if let Err(e) = std::fs::create_dir_all(notes_dir) {
+    let note = Note::new(jiff::Timestamp::now(), body.to_string());
+    if let Err(e) = note.save_to_file(&notes_dir) {
         tracing::error!("{:?}", e);
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
-            "failed to create notes directory".to_string(),
-        );
-    }
-
-    if let Err(e) = std::fs::write(file_name, body) {
-        tracing::error!("{:?}", e);
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "failed to write note.".to_string(),
+            "failed to save note".to_string(),
         );
     }
 
@@ -112,10 +101,11 @@ async fn get_notes(
             tracing::error!("{:?}", e);
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "failed tolist notes in notes dir".to_string(),
+                "failed to list notes in notes dir".to_string(),
             );
         }
     };
+
     let mut files: Vec<PathBuf> = match read_dir
         .map(|dir_entry| dir_entry.map(|dir_entry| dir_entry.path()))
         .collect::<Result<Vec<PathBuf>, std::io::Error>>()
@@ -129,50 +119,28 @@ async fn get_notes(
             );
         }
     };
+
     files.sort_unstable();
     files.reverse();
 
     for file in &files {
-        let file_contents = match std::fs::read_to_string(file) {
-            Ok(file_contents) => file_contents,
+        let note = match Note::from_filepath(file) {
+            Ok(note) => note,
             Err(e) => {
                 tracing::error!("{:?}", e);
                 return (
                     StatusCode::INTERNAL_SERVER_ERROR,
-                    "failed to read a note".to_string(),
+                    "failed to read a note from a file".to_string(),
                 );
             }
         };
-
-        let timestamp: i64 = match file
-            .file_stem()
-            .expect("files created in the directory by this program should always have a stem")
-            .to_string_lossy()
-            .parse()
-        {
-            Ok(timestamp) => timestamp,
-            Err(_) => continue,
-        };
-
-        let timestamp = match jiff::Timestamp::from_millisecond(timestamp) {
-            Ok(timestamp) => timestamp,
-            Err(e) => {
-                tracing::error!("{:?}", e);
-                return (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "failed to create a timestamp from a file".to_string(),
-                );
-            }
-        };
-
-        let timestamp = timestamp
-            .to_zoned(jiff::tz::TimeZone::system())
-            .strftime("%a %b %d %H:%M:%S %Y");
 
         output.push_str(&format!(
             "{}\n=====\n> {}\n\n",
-            timestamp,
-            file_contents.replace('\n', "\n> "),
+            note.timestamp
+                .to_zoned(jiff::tz::TimeZone::system())
+                .strftime("%a %b %d %H:%M:%S %Y"),
+            note.contents.replace('\n', "\n> "),
         ));
     }
 
