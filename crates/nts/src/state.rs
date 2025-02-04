@@ -14,8 +14,6 @@ pub struct State {
 
     pub password_hash: Option<String>,
 
-    pub external_url: String,
-
     pub template: String,
 
     pub new_script: String,
@@ -51,7 +49,6 @@ impl State {
         Ok(Self {
             data_dir,
             password_hash,
-            external_url,
             template,
             new_script,
             get_script,
