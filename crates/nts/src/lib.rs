@@ -57,7 +57,7 @@ async fn new_note(
 ) -> (StatusCode, String) {
     let body = body.trim();
 
-    if body == state.0.template.trim() {
+    if body == state.0.template.trim() || body.is_empty() {
         return (StatusCode::OK, "note was empty".to_string());
     }
 
