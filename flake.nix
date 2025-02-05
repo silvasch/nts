@@ -37,6 +37,12 @@
         };
 
         packages.nts = naersk'.buildPackage {
+          pname = "nts";
+          src = ./.;
+        };
+
+        packages.nts_set_pwd = naersk'.buildPackage {
+          pname = "nts_set_pwd";
           src = ./.;
         };
 
