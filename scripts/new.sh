@@ -15,7 +15,7 @@ TEMPLATE=$(curl -s localhost:9112/api/get-template)
 
 rm -rf .nts-note
 echo "$TEMPLATE" > .nts-note
-${EDITOR:-nano} .nts-note
+${EDITOR:-nano} .nts-note < /dev/tty > /dev/tty 2>&1
 NOTE=$(cat .nts-note)
 rm .nts-note
 
